@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For My Baby ❤️</title>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+:root {
+--bg-gradient: linear-gradient(135deg, #2d0b0b 0%, #6d1b1b 50%, #9e2a2a 100%);
+--pink: #ff4d6d;
+}
+
+body, html {
+margin: 0; padding: 0;
+width: 100%; height: 100%;
+overflow: hidden;
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+background: var(--bg-gradient);
+display: flex; justify-content: center; align-items: center;
+color: white; text-align: center;
+}
+
+#particle-canvas {
+position: fixed; top: 0; left: 0; z-index: 1; pointer-events: none;
+}
+
+.container {
+position: relative; z-index: 10;
+padding: 30px; width: 90%; max-width: 500px;
+background: rgba(255, 255, 255, 0.1);
+backdrop-filter: blur(10px);
+border-radius: 20px;
+box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.gif-container { width: 100%; margin-bottom: 20px; min-height: 200px; }
+
+h1 { font-size: 1.8rem; margin: 20px 0; min-height: 60px; }
+
+.btn-group {
+display: flex; gap: 20px; justify-content: center;
+align-items: center; position: relative; height: 60px;
+}
+
+button {
+padding: 12px 30px; font-size: 1.1rem; font-weight: bold;
+border: none; border-radius: 12px; cursor: pointer;
+transition: all 0.3s ease;
+}
+
+#yes-btn { background: var(--pink); color: white; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4); }
+
+#no-btn { background: white; color: #333; position: relative; }
+
+.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+
+<div class="container">
+<div id="game-content">
+<div class="gif-container" id="gif-wrap">
+<div class="tenor-gif-embed" data-postid="22885016" data-share-method="host" data-aspect-ratio="1.04918" data-width="100%"></div>
+</div>
+
+<h1 id="display-text">CAN I BE YOURS BABY?</h1>
+
+<div class="btn-group">
+<button id="yes-btn" onclick="handleYes()">Yes ❤️</button>
+<button id="no-btn" onclick="handleNo()">No 😅</button>
+</div>
+</div>
+
+<div id="success-screen" class="hidden">
+  <h1 style="font-size: 4rem;">HEHE 😌💖</h1>
+  <h2 style="font-size: 2rem;">Abhishek officially belongs to me now.</h2>
+  <h3 style="margin-top: 20px;">No returns. No refunds. Lifetime warranty. 💘</h3>
+  <h5 style="margin-top: 10px;">
+    From this Valentine’s Day onward,
+    you're stuck with someone who loves you
+    a little too much and forever. 💞
+  </h5>
+</div>
+
+<audio id="bg-music" loop>
+<source src="https://www.chosic.com/wp-content/uploads/2021/04/Warm-Memories-Emotional-Inspiring-Piano.mp3" type="audio/mpeg">
+</audio>
+
+<script type="text/javascript" async src="https://tenor.com/embed.js"></script>
+
+<script>
+const noResponses = [
+{ text: "Wait... are you sure? My heart just skipped a beat. 💔", gif: "18243104309700112474" },
+{ text: "I promise to be your biggest supporter-fighter too. 🤝", gif: "16367750" },
+{ text: "But I’ve already imagined our forever... 🥺", gif: "20739728" },
+{ text: "Okay, now you're just being a mean! 😤 ", gif: "482557620391773062" },
+{ text: "Don't break my heart, baby... 😭", gif: "26945330" },
+{ text: "One last chance to change our destiny? ✨", gif: "22267856" },
+{ text: "I won't give up on us. Please say Yes! ❤️", gif: "27402556" }
+];
+
+let noCount = 0;
+const noBtn = document.getElementById('no-btn');
+const yesBtn = document.getElementById('yes-btn');
+const displayText = document.getElementById('display-text');
+const gifWrap = document.getElementById('gif-wrap');
+
+function handleNo() {
+if (noCount < noResponses.length) {
+const response = noResponses[noCount];
+displayText.innerText = response.text;
+
+// Update GIF
+gifWrap.innerHTML = `<div class="tenor-gif-embed" data-postid="${response.gif}" data-share-method="host" data-aspect-ratio="1" data-width="100%"></div>`;
+// Re-run Tenor embed script
+const script = document.createElement('script');
+script.src = "https://tenor.com/embed.js";
+document.body.appendChild(script);
+
+// Make the Yes button grow bigger each time!
+let currentScale = 1 + (noCount * 0.15);
+yesBtn.style.transform = `scale(${currentScale})`;
+
+noCount++;
+} else {
+// Final "No" logic: Make it run away
+moveRandom(noBtn);
+noBtn.onmouseover = () => moveRandom(noBtn);
+noBtn.ontouchstart = () => moveRandom(noBtn);
+}
+}
+
+function moveRandom(elm) {
+elm.style.position = "fixed";
+elm.style.top = (Math.random() * 80 + 10) + "%";
+elm.style.left = (Math.random() * 80 + 10) + "%";
+}
+
+function handleYes() {
+document.getElementById('game-content').classList.add('hidden');
+document.getElementById('success-screen').classList.remove('hidden');
+
+const music = document.getElementById('bg-music');
+music.play();
+
+// Confetti
+confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+}
+
+// Heart Particles Logic
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let hearts = [];
+
+function resize() {
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+}
+
+class Heart {
+constructor() { this.reset(); }
+reset() {
+this.x = Math.random() * canvas.width;
+this.y = canvas.height + 20;
+this.size = Math.random() * 10 + 5;
+this.speed = Math.random() * 1.5 + 0.5;
+this.opacity = Math.random() * 0.4 + 0.1;
+}
+draw() {
+ctx.fillStyle = `rgba(255, 77, 109, ${this.opacity})`;
+ctx.beginPath();
+ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+ctx.fill();
+}
+update() {
+this.y -= this.speed;
+if (this.y < -20) this.reset();
+}
+}
+
+for (let i = 0; i < 30; i++) hearts.push(new Heart());
+function animate() {
+ctx.clearRect(0,0,canvas.width, canvas.height);
+hearts.forEach(h => { h.update(); h.draw(); });
+requestAnimationFrame(animate);
+}
+window.addEventListener('resize', resize);
+resize(); animate();
+</script>
+</body>
+</html>
